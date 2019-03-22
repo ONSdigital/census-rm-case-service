@@ -1,0 +1,11 @@
+databaseChangeLog:
+
+- changeSet:
+    id: 20-1
+    author: Luke Loze
+    changes:
+    - sqlFile:
+        comment: case group table, make sampleunitref 21 chars long to handle new DDR
+        path: sample-unit-ref-to-21-long.sql
+        relativeToChangelogFile: true
+        splitStatements: false
