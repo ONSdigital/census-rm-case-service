@@ -1,10 +1,14 @@
 FROM openjdk:8-jre-slim
 
-ARG JAR_FILE=census-rm-casesvc*.jar
+VOLUME /tmp
+ARG JAR_FILE=casesvc*.jar
 RUN apt-get update
-RUN apt-get -yq install curl
 RUN apt-get -yq clean
-COPY target/$JAR_FILE /opt/census-rm-casesvc.jar
 
-ENTRYPOINT [ "sh", "-c", "java $JAVA_OPTS -jar /opt/census-rm-casesvc.jar" ]
+RUN groupadd --gid 999 casesvc && \
+    useradd --create-home --system --uid 999 --gid casesvc casesvc
+USER casesvc
 
+COPY target/$JAR_FILE /opt/casesvc.jar
+
+ENTRYPOINT [ "java", "-jar", "/opt/casesvc.jar" ]
