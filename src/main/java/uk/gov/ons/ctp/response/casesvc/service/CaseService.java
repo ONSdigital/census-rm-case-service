@@ -31,6 +31,7 @@ import uk.gov.ons.ctp.response.casesvc.domain.repository.CaseIacAuditRepository;
 import uk.gov.ons.ctp.response.casesvc.domain.repository.CaseRepository;
 import uk.gov.ons.ctp.response.casesvc.domain.repository.CategoryRepository;
 import uk.gov.ons.ctp.response.casesvc.message.CaseNotificationPublisher;
+import uk.gov.ons.ctp.response.casesvc.message.EventPublisher;
 import uk.gov.ons.ctp.response.casesvc.message.notification.CaseNotification;
 import uk.gov.ons.ctp.response.casesvc.message.notification.NotificationType;
 import uk.gov.ons.ctp.response.casesvc.message.sampleunitnotification.SampleUnit;
@@ -42,6 +43,7 @@ import uk.gov.ons.ctp.response.casesvc.representation.CategoryDTO;
 import uk.gov.ons.ctp.response.casesvc.representation.CategoryDTO.CategoryName;
 import uk.gov.ons.ctp.response.casesvc.representation.InboundChannel;
 import uk.gov.ons.ctp.response.casesvc.utility.Constants;
+import uk.gov.ons.ctp.response.casesvc.utility.IacDispenser;
 import uk.gov.ons.ctp.response.collection.exercise.representation.CollectionExerciseDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitType;
@@ -74,6 +76,8 @@ public class CaseService {
   private CaseIACService caseIacAuditService;
   private CaseNotificationPublisher notificationPublisher;
   private StateTransitionManager<CaseState, CaseDTO.CaseEvent> caseSvcStateTransitionManager;
+  private IacDispenser iacDispenser;
+  private EventPublisher eventPublisher;
 
   /** Constructor for CaseService */
   public CaseService(
@@ -88,7 +92,9 @@ public class CaseService {
       final InternetAccessCodeSvcClient internetAccessCodeSvcClient,
       final CaseIACService caseIacAuditService,
       final CaseNotificationPublisher notificationPublisher,
-      final StateTransitionManager<CaseState, CaseDTO.CaseEvent> caseSvcStateTransitionManager) {
+      final StateTransitionManager<CaseState, CaseDTO.CaseEvent> caseSvcStateTransitionManager,
+      final IacDispenser iacDispenser,
+      final EventPublisher eventPublisher) {
     this.caseRepo = caseRepo;
     this.caseEventRepo = caseEventRepo;
     this.caseGroupRepo = caseGroupRepo;
@@ -101,6 +107,8 @@ public class CaseService {
     this.caseIacAuditService = caseIacAuditService;
     this.notificationPublisher = notificationPublisher;
     this.caseSvcStateTransitionManager = caseSvcStateTransitionManager;
+    this.iacDispenser = iacDispenser;
+    this.eventPublisher = eventPublisher;
   }
 
   /**
@@ -316,7 +324,7 @@ public class CaseService {
     caseIacAudit.setCaseFK(updatedCase.getCasePK());
     caseIacAudit.setIac(updatedCase.getIac());
     caseIacAudit.setCreatedDateTime(DateTimeUtil.nowUTC());
-    caseIacAuditRepo.saveAndFlush(caseIacAudit);
+    caseIacAuditRepo.save(caseIacAudit);
   }
 
   /**
@@ -389,7 +397,6 @@ public class CaseService {
     }
   }
 
-  @Transactional
   public void createInitialCase(SampleUnitParent sampleUnitParent) {
     CaseGroup newCaseGroup = createNewCaseGroup(sampleUnitParent);
     log.with("case_group_id", newCaseGroup.getId()).debug("Created new casegroup");
@@ -398,25 +405,14 @@ public class CaseService {
     category.setShortDescription("Initial creation of case");
 
     Case parentCase = createNewCase(sampleUnitParent, newCaseGroup);
-    if (sampleUnitParent.getSampleUnitChildren() != null
-        && !sampleUnitParent.getSampleUnitChildren().getSampleUnitchildren().isEmpty()) {
-      parentCase.setState(CaseState.INACTIONABLE);
+    caseRepo.save(parentCase);
 
-      for (SampleUnit sampleUnitChild :
-          sampleUnitParent.getSampleUnitChildren().getSampleUnitchildren()) {
-        Case childCase = createNewCase(sampleUnitChild, newCaseGroup);
-        caseRepo.saveAndFlush(childCase);
-        createCaseCreatedEvent(childCase, category);
-        log.with("case_id", childCase.getId().toString())
-            .with("sample_unit_type", childCase.getSampleUnitType().toString())
-            .debug("New Case created");
-      }
-    }
-    caseRepo.saveAndFlush(parentCase);
     createCaseCreatedEvent(parentCase, category);
     log.with("case_id", parentCase.getId().toString())
         .with("sample_unit_type", parentCase.getSampleUnitType().toString())
         .debug("New Case created");
+
+    distributeCase(parentCase, iacDispenser.getIacCode());
   }
 
   /**
@@ -573,7 +569,7 @@ public class CaseService {
     newCaseCaseEvent.setDescription(
         String.format(CASE_CREATED_EVENT_DESCRIPTION, caseEventCategory.getShortDescription()));
 
-    caseEventRepo.saveAndFlush(newCaseCaseEvent);
+    caseEventRepo.save(newCaseCaseEvent);
   }
 
   /**
@@ -600,7 +596,7 @@ public class CaseService {
 
     newCaseGroup.setSurveyId(UUID.fromString(collectionExercise.getSurveyId()));
 
-    caseGroupRepo.saveAndFlush(newCaseGroup);
+    caseGroupRepo.save(newCaseGroup);
     log.with("case_group_id", newCaseGroup.getId().toString()).debug("New CaseGroup created");
     return newCaseGroup;
   }
@@ -625,5 +621,28 @@ public class CaseService {
     } catch (IllegalArgumentException exc) {
       throw new CTPException(CTPException.Fault.BAD_REQUEST, exc.getMessage());
     }
+  }
+
+  private void distributeCase(final Case caze, final String iac) {
+    log.with("case_id", caze.getId()).debug("Processing case");
+
+    CaseDTO.CaseEvent event = CaseDTO.CaseEvent.ACTIVATED;
+    eventPublisher.publishEvent("case Activated");
+
+    CaseState nextState;
+    try {
+      nextState = caseSvcStateTransitionManager.transition(caze.getState(), event);
+    } catch (CTPException e) {
+      throw new IllegalStateException(); // This should never happen - case is brand new
+    }
+    caze.setState(nextState);
+    caze.setIac(iac);
+    Case updatedCase = caseRepo.save(caze);
+
+    saveCaseIacAudit(updatedCase);
+
+    CaseNotification caseNotification = prepareCaseNotification(updatedCase, event);
+    log.debug("Publishing caseNotification...");
+    notificationPublisher.sendNotification(caseNotification);
   }
 }

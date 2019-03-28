@@ -62,7 +62,7 @@ spring:
     continue-on-error: true
     tomcat:
       initial-size: 5
-      max-active: 10
+      max-active: 50
       max-idle: 5
       min-idle: 3
   zipkin:
@@ -118,6 +118,8 @@ collection-exercise-svc:
 case-distribution:
   retrieval-max: 50
   delay-milli-seconds: 500
+  iac-pool-size-max: 1000
+  iac-pool-size-min: 500
 
 redelivery-policy:
   maxRedeliveries: 10
@@ -135,7 +137,7 @@ messaging:
   backoffInitial: 5000
   backoffMultiplier: 3
   backoffMax: 45000
-  consumingThreads: 1
+  consumingThreads: 50
   pubMaxAttempts: 3
   conMaxAttempts: 3
   prefetchCount: 10

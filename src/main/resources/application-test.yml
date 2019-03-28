@@ -28,6 +28,8 @@ data-grid:
 case-distribution:
   retrieval-max: 50
   delay-milli-seconds: 500
+  iac-pool-size-max: 1000
+  iac-pool-size-min: 500
 
 schedules:
   validation-schedule-delay-milli-seconds: 1000

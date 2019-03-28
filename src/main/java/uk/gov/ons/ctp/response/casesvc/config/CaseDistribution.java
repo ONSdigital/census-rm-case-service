@@ -10,4 +10,6 @@ public class CaseDistribution {
   private Integer retrievalMax;
   private Integer retrySleepSeconds;
   private Long delayMilliSeconds;
+  private Integer iacPoolSizeMin;
+  private Integer iacPoolSizeMax;
 }

@@ -12,6 +12,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ImportResource;
@@ -19,6 +22,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.integration.annotation.IntegrationComponentScan;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.ons.ctp.common.distributed.DistributedInstanceManager;
@@ -55,6 +59,7 @@ public class CaseSvcApplication {
 
   public static final String CASE_DISTRIBUTION_LIST = "casesvc.case.distribution";
   public static final String REPORT_EXECUTION_LOCK = "casesvc.report.execution";
+  public static final String COLLEX_CACHE_NAME = "collectionexercises";
 
   private AppConfig appConfig;
   private StateTransitionManagerFactory caseSvcStateTransitionManagerFactory;
@@ -246,5 +251,18 @@ public class CaseSvcApplication {
   @Bean
   public Clock clock() {
     return Clock.systemDefaultZone();
+  }
+
+  @Bean
+  public CacheManager cacheManager() {
+    return new ConcurrentMapCacheManager(COLLEX_CACHE_NAME);
+  }
+
+  @CacheEvict(
+      allEntries = true,
+      cacheNames = {COLLEX_CACHE_NAME})
+  @Scheduled(fixedDelay = 60000)
+  public void cacheEvict() {
+    // This is gets rid of the cached collection exercises every minute in case of any changes
   }
 }
