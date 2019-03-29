@@ -20,7 +20,6 @@ import static uk.gov.ons.ctp.response.casesvc.representation.CategoryDTO.Categor
 import static uk.gov.ons.ctp.response.casesvc.service.CaseService.WRONG_OLD_SAMPLE_UNIT_TYPE_MSG;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -59,15 +58,14 @@ import uk.gov.ons.ctp.response.casesvc.domain.repository.CaseIacAuditRepository;
 import uk.gov.ons.ctp.response.casesvc.domain.repository.CaseRepository;
 import uk.gov.ons.ctp.response.casesvc.domain.repository.CategoryRepository;
 import uk.gov.ons.ctp.response.casesvc.message.CaseNotificationPublisher;
+import uk.gov.ons.ctp.response.casesvc.message.EventPublisher;
 import uk.gov.ons.ctp.response.casesvc.message.notification.CaseNotification;
-import uk.gov.ons.ctp.response.casesvc.message.sampleunitnotification.SampleUnit;
-import uk.gov.ons.ctp.response.casesvc.message.sampleunitnotification.SampleUnitChildren;
-import uk.gov.ons.ctp.response.casesvc.message.sampleunitnotification.SampleUnitParent;
 import uk.gov.ons.ctp.response.casesvc.representation.CaseDTO;
 import uk.gov.ons.ctp.response.casesvc.representation.CaseGroupStatus;
 import uk.gov.ons.ctp.response.casesvc.representation.CaseState;
 import uk.gov.ons.ctp.response.casesvc.representation.CategoryDTO;
 import uk.gov.ons.ctp.response.casesvc.representation.CategoryDTO.CategoryName;
+import uk.gov.ons.ctp.response.casesvc.utility.IacDispenser;
 import uk.gov.ons.ctp.response.collection.exercise.representation.CollectionExerciseDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 
@@ -137,6 +135,9 @@ public class CaseServiceTest {
   @Mock private CaseNotificationPublisher notificationPublisher;
   @Mock private StateTransitionManager<CaseState, CaseDTO.CaseEvent> caseSvcStateTransitionManager;
   @Spy private MapperFacade mapperFacade = new CaseSvcBeanMapper();
+
+  @Mock private IacDispenser iacDispenser;
+  @Mock private EventPublisher eventPublisher;
 
   @InjectMocks private CaseService caseService;
 
@@ -1018,44 +1019,7 @@ public class CaseServiceTest {
 
     Case updatedBCase = mapperFacade.map(actionableBCase, Case.class);
     updatedBCase.setIac(IAC_FOR_TEST);
-    verify(caseIacAuditRepo, times(1)).saveAndFlush(any());
-  }
-
-  @Test
-  public void testCreateInitialCaseWithSampleUnitChildren() throws Exception {
-    SampleUnitParent sampleUnitParent = new SampleUnitParent();
-    SampleUnit sampleUnit = new SampleUnit();
-    SampleUnitChildren sampleUnitChildren =
-        new SampleUnitChildren(new ArrayList<>(Collections.singletonList(sampleUnit)));
-    sampleUnit.setActionPlanId(UUID.randomUUID().toString());
-    sampleUnit.setCollectionInstrumentId(UUID.randomUUID().toString());
-    sampleUnit.setPartyId(UUID.randomUUID().toString());
-    sampleUnit.setSampleUnitRef("str1234");
-    sampleUnit.setSampleUnitType("BI");
-    sampleUnit.setId(UUID.randomUUID().toString());
-
-    sampleUnitParent.setActionPlanId(UUID.randomUUID().toString());
-    sampleUnitParent.setCollectionExerciseId(UUID.randomUUID().toString());
-    sampleUnitParent.setSampleUnitChildren(sampleUnitChildren);
-    sampleUnitParent.setCollectionInstrumentId(UUID.randomUUID().toString());
-    sampleUnitParent.setPartyId(UUID.randomUUID().toString());
-    sampleUnitParent.setSampleUnitRef("str1234");
-    sampleUnitParent.setSampleUnitType("B");
-    sampleUnitParent.setId(UUID.randomUUID().toString());
-
-    List<CollectionExerciseDTO> collectionExercises =
-        FixtureHelper.loadClassFixtures(CollectionExerciseDTO[].class);
-    when(collectionExerciseSvcClient.getCollectionExercise(any()))
-        .thenReturn(collectionExercises.get(0));
-
-    caseService.createInitialCase(sampleUnitParent);
-
-    ArgumentCaptor<CaseGroup> caseGroup = ArgumentCaptor.forClass(CaseGroup.class);
-    verify(caseGroupRepo, times(1)).saveAndFlush(caseGroup.capture());
-
-    List<CaseGroup> capturedCaseGroup = caseGroup.getAllValues();
-
-    verify(caseRepo, times(2)).saveAndFlush(any());
+    verify(caseIacAuditRepo, times(1)).save(any(CaseIacAudit.class));
   }
 
   @Test(expected = IllegalStateException.class)
