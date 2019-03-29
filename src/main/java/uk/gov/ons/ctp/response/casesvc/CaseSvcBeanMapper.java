@@ -3,17 +3,17 @@ package uk.gov.ons.ctp.response.casesvc;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.ConfigurableMapper;
 import org.springframework.stereotype.Component;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CaseDTO;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CaseDetailsDTO;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CaseEventDTO;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CaseGroupDTO;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CategoryDTO;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.ResponseDTO;
 import uk.gov.ons.ctp.response.casesvc.domain.model.Case;
 import uk.gov.ons.ctp.response.casesvc.domain.model.CaseEvent;
 import uk.gov.ons.ctp.response.casesvc.domain.model.CaseGroup;
 import uk.gov.ons.ctp.response.casesvc.domain.model.Category;
 import uk.gov.ons.ctp.response.casesvc.domain.model.Response;
-import uk.gov.ons.ctp.response.casesvc.representation.CaseDTO;
-import uk.gov.ons.ctp.response.casesvc.representation.CaseDetailsDTO;
-import uk.gov.ons.ctp.response.casesvc.representation.CaseEventDTO;
-import uk.gov.ons.ctp.response.casesvc.representation.CaseGroupDTO;
-import uk.gov.ons.ctp.response.casesvc.representation.CategoryDTO;
-import uk.gov.ons.ctp.response.casesvc.representation.ResponseDTO;
 
 /** The bean mapper that maps to/from DTOs and JPA entity types. */
 @Component

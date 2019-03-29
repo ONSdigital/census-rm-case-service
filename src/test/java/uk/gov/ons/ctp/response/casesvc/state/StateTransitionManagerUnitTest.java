@@ -5,10 +5,10 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
-import uk.gov.ons.ctp.response.casesvc.representation.CaseDTO;
-import uk.gov.ons.ctp.response.casesvc.representation.CaseGroupStatus;
-import uk.gov.ons.ctp.response.casesvc.representation.CaseState;
-import uk.gov.ons.ctp.response.casesvc.representation.CategoryDTO;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CaseDTO;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CaseGroupStatus;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CaseState;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CategoryDTO;
 
 public class StateTransitionManagerUnitTest {
 

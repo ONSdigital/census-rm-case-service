@@ -16,7 +16,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.ons.ctp.response.casesvc.representation.CategoryDTO.CategoryName.EQ_LAUNCH;
+import static uk.gov.ons.ctp.response.casesvc.domain.dto.CategoryDTO.CategoryName.EQ_LAUNCH;
 import static uk.gov.ons.ctp.response.casesvc.service.CaseService.WRONG_OLD_SAMPLE_UNIT_TYPE_MSG;
 
 import java.sql.Timestamp;
@@ -47,6 +47,11 @@ import uk.gov.ons.ctp.response.casesvc.client.CollectionExerciseSvcClient;
 import uk.gov.ons.ctp.response.casesvc.client.InternetAccessCodeSvcClient;
 import uk.gov.ons.ctp.response.casesvc.config.AppConfig;
 import uk.gov.ons.ctp.response.casesvc.config.InternetAccessCodeSvc;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CaseDTO;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CaseGroupStatus;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CaseNotification;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CaseState;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CategoryDTO;
 import uk.gov.ons.ctp.response.casesvc.domain.model.Case;
 import uk.gov.ons.ctp.response.casesvc.domain.model.CaseEvent;
 import uk.gov.ons.ctp.response.casesvc.domain.model.CaseGroup;
@@ -59,12 +64,6 @@ import uk.gov.ons.ctp.response.casesvc.domain.repository.CaseRepository;
 import uk.gov.ons.ctp.response.casesvc.domain.repository.CategoryRepository;
 import uk.gov.ons.ctp.response.casesvc.message.CaseNotificationPublisher;
 import uk.gov.ons.ctp.response.casesvc.message.EventPublisher;
-import uk.gov.ons.ctp.response.casesvc.message.notification.CaseNotification;
-import uk.gov.ons.ctp.response.casesvc.representation.CaseDTO;
-import uk.gov.ons.ctp.response.casesvc.representation.CaseGroupStatus;
-import uk.gov.ons.ctp.response.casesvc.representation.CaseState;
-import uk.gov.ons.ctp.response.casesvc.representation.CategoryDTO;
-import uk.gov.ons.ctp.response.casesvc.representation.CategoryDTO.CategoryName;
 import uk.gov.ons.ctp.response.casesvc.utility.IacDispenser;
 import uk.gov.ons.ctp.response.collection.exercise.representation.CollectionExerciseDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
@@ -141,7 +140,7 @@ public class CaseServiceTest {
 
   @InjectMocks private CaseService caseService;
 
-  @Captor ArgumentCaptor<Set<CategoryName>> argumentCaptor;
+  @Captor ArgumentCaptor<Set<CategoryDTO.CategoryName>> argumentCaptor;
 
   private List<Case> cases;
   private List<Category> categories;
@@ -945,7 +944,7 @@ public class CaseServiceTest {
     when(caseRepo.findOne(ACTIONABLE_BUSINESS_UNIT_CASE_FK))
         .thenReturn(cases.get(ACTIONABLE_BUSINESS_UNIT_CASE_FK));
     Category noActiveEnrolmentCategory = categories.get(CAT_NO_ACTIVE_ENROLMENTS);
-    when(categoryRepo.findOne(CategoryName.NO_ACTIVE_ENROLMENTS))
+    when(categoryRepo.findOne(CategoryDTO.CategoryName.NO_ACTIVE_ENROLMENTS))
         .thenReturn(noActiveEnrolmentCategory);
     when(caseRepo.findByCaseGroupId(null))
         .thenReturn(
@@ -966,11 +965,12 @@ public class CaseServiceTest {
         .thenReturn(Collections.singletonList(actionPlan));
 
     CaseEvent caseEvent =
-        fabricateEvent(CategoryName.NO_ACTIVE_ENROLMENTS, ACTIONABLE_BUSINESS_UNIT_CASE_FK);
+        fabricateEvent(
+            CategoryDTO.CategoryName.NO_ACTIVE_ENROLMENTS, ACTIONABLE_BUSINESS_UNIT_CASE_FK);
     caseService.createCaseEvent(caseEvent);
 
     verify(caseRepo, times(1)).findOne(ACTIONABLE_BUSINESS_UNIT_CASE_FK);
-    verify(categoryRepo).findOne(CategoryName.NO_ACTIVE_ENROLMENTS);
+    verify(categoryRepo).findOne(CategoryDTO.CategoryName.NO_ACTIVE_ENROLMENTS);
     verify(caseEventRepo, times(1)).save(caseEvent);
     ArgumentCaptor<Case> argument = ArgumentCaptor.forClass(Case.class);
     verify(caseRepo, times(2)).saveAndFlush(argument.capture());

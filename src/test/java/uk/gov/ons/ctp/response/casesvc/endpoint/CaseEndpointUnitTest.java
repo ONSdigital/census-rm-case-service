@@ -52,16 +52,16 @@ import uk.gov.ons.ctp.common.jackson.CustomObjectMapper;
 import uk.gov.ons.ctp.common.matcher.DateMatcher;
 import uk.gov.ons.ctp.response.casesvc.CaseSvcBeanMapper;
 import uk.gov.ons.ctp.response.casesvc.client.InternetAccessCodeSvcClient;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CaseEventCreationRequestDTO;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CaseGroupStatus;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CaseState;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CategoryDTO;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.InboundChannel;
 import uk.gov.ons.ctp.response.casesvc.domain.model.Case;
 import uk.gov.ons.ctp.response.casesvc.domain.model.CaseEvent;
 import uk.gov.ons.ctp.response.casesvc.domain.model.CaseGroup;
 import uk.gov.ons.ctp.response.casesvc.domain.model.Category;
 import uk.gov.ons.ctp.response.casesvc.domain.repository.CaseRepository;
-import uk.gov.ons.ctp.response.casesvc.representation.CaseEventCreationRequestDTO;
-import uk.gov.ons.ctp.response.casesvc.representation.CaseGroupStatus;
-import uk.gov.ons.ctp.response.casesvc.representation.CaseState;
-import uk.gov.ons.ctp.response.casesvc.representation.CategoryDTO.CategoryName;
-import uk.gov.ons.ctp.response.casesvc.representation.InboundChannel;
 import uk.gov.ons.ctp.response.casesvc.service.CaseGroupService;
 import uk.gov.ons.ctp.response.casesvc.service.CaseService;
 import uk.gov.ons.ctp.response.casesvc.service.CategoryService;
@@ -531,7 +531,7 @@ public final class CaseEndpointUnitTest {
   @Test
   public void findCaseByIAC() throws Exception {
     when(caseService.findCaseByIac(IAC_CASE1)).thenReturn(caseResults.get(0));
-    when(categoryService.findCategory(CategoryName.ACCESS_CODE_AUTHENTICATION_ATTEMPT))
+    when(categoryService.findCategory(CategoryDTO.CategoryName.ACCESS_CODE_AUTHENTICATION_ATTEMPT))
         .thenReturn(categoryResults.get(4));
 
     ResultActions actions = mockMvc.perform(getJson(String.format("/cases/iac/%s", IAC_CASE1)));
@@ -542,7 +542,7 @@ public final class CaseEndpointUnitTest {
   @Test
   public void findCaseByIACButCategoryNotDefined() throws Exception {
     when(caseService.findCaseByIac(IAC_CASE1)).thenReturn(caseResults.get(0));
-    when(categoryService.findCategory(CategoryName.ACCESS_CODE_AUTHENTICATION_ATTEMPT))
+    when(categoryService.findCategory(CategoryDTO.CategoryName.ACCESS_CODE_AUTHENTICATION_ATTEMPT))
         .thenReturn(null);
 
     ResultActions actions = mockMvc.perform(getJson(String.format("/cases/iac/%s", IAC_CASE1)));
@@ -794,7 +794,7 @@ public final class CaseEndpointUnitTest {
    */
   @Test
   public void createCaseEventGoodJson() throws Exception {
-    when(categoryService.findCategory(CategoryName.RESPONDENT_ENROLED))
+    when(categoryService.findCategory(CategoryDTO.CategoryName.RESPONDENT_ENROLED))
         .thenReturn(categoryResults.get(3));
     when(caseService.createCaseEvent(any(CaseEvent.class), any(Case.class)))
         .thenReturn(caseEventsResults.get(3));
@@ -823,7 +823,7 @@ public final class CaseEndpointUnitTest {
   @Test
   public void createCaseEventWithMetadata() throws Exception {
     // Given
-    when(categoryService.findCategory(CategoryName.RESPONDENT_ENROLED))
+    when(categoryService.findCategory(CategoryDTO.CategoryName.RESPONDENT_ENROLED))
         .thenReturn(categoryResults.get(3));
     when(caseService.createCaseEvent(any(CaseEvent.class), any(Case.class)))
         .thenReturn(caseEventsResults.get(3));
@@ -854,7 +854,7 @@ public final class CaseEndpointUnitTest {
    */
   @Test
   public void createCaseEventNoNewCase() throws Exception {
-    when(categoryService.findCategory(CategoryName.GENERAL_ENQUIRY))
+    when(categoryService.findCategory(CategoryDTO.CategoryName.GENERAL_ENQUIRY))
         .thenReturn(categoryResults.get(0));
     when(caseService.createCaseEvent(any(CaseEvent.class), any(Case.class)))
         .thenReturn(caseEventsResults.get(3));
@@ -977,7 +977,7 @@ public final class CaseEndpointUnitTest {
    */
   @Test
   public void createCaseEventGoodJsonButVersusIncorrectSampleUnitType() throws Exception {
-    when(categoryService.findCategory(CategoryName.RESPONDENT_ENROLED))
+    when(categoryService.findCategory(CategoryDTO.CategoryName.RESPONDENT_ENROLED))
         .thenReturn(categoryResults.get(3));
     when(caseService.findCaseById(CASE9_ID)).thenReturn(caseResults.get(8));
     when(caseService.createCaseEvent(any(CaseEvent.class), any(Case.class)))

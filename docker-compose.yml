@@ -65,7 +65,7 @@ services:
 
   action:
     container_name: action-case-it
-    image: sdcplatform/actionsvc
+    image: eu.gcr.io/census-rm-ci/rm/census-rm-actionsvc
     external_links:
     - postgres-case-it
     - rabbitmq-case-it

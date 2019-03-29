@@ -34,10 +34,10 @@
     channel="caseCreationInvalid" exchange-name="collection-invalid-exchange"
     id="invalidCaseOutboundAmqp" routing-key="Case.CaseDelivery.binding"/>
   <!-- Option to be used in Debug/Test: throw-exception-on-rejection="true" -->
-  <int-xml:validating-filter discard-channel="caseCreationInvalid"
-    id="caseValidator" input-channel="caseCreation"
-    output-channel="caseCreationValid"
-    schema-location="classpath:casesvc/xsd/inbound/SampleUnitNotification.xsd"/>
+  <!--<int-xml:validating-filter discard-channel="caseCreationInvalid"-->
+    <!--id="caseValidator" input-channel="caseCreation"-->
+    <!--output-channel="caseCreationValid"-->
+    <!--schema-location="classpath:casesvc/xsd/inbound/SampleUnitNotification.xsd"/>-->
 
 
   <!-- Validated xml is transformed into the jaxb generated object model -->

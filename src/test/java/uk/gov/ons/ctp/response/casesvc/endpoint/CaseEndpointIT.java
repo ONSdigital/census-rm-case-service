@@ -24,15 +24,15 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.ons.ctp.common.UnirestInitialiser;
 import uk.gov.ons.ctp.response.casesvc.CaseCreator;
 import uk.gov.ons.ctp.response.casesvc.client.CollectionExerciseSvcClient;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CaseDetailsDTO;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CaseEventCreationRequestDTO;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CaseEventDTO;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CaseGroupStatus;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CaseNotification;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CategoryDTO;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CreatedCaseEventDTO;
 import uk.gov.ons.ctp.response.casesvc.domain.repository.CaseEventRepository;
 import uk.gov.ons.ctp.response.casesvc.domain.repository.CaseRepository;
-import uk.gov.ons.ctp.response.casesvc.message.notification.CaseNotification;
-import uk.gov.ons.ctp.response.casesvc.representation.CaseDetailsDTO;
-import uk.gov.ons.ctp.response.casesvc.representation.CaseEventCreationRequestDTO;
-import uk.gov.ons.ctp.response.casesvc.representation.CaseEventDTO;
-import uk.gov.ons.ctp.response.casesvc.representation.CaseGroupStatus;
-import uk.gov.ons.ctp.response.casesvc.representation.CategoryDTO.CategoryName;
-import uk.gov.ons.ctp.response.casesvc.representation.CreatedCaseEventDTO;
 import uk.gov.ons.ctp.response.collection.exercise.representation.CollectionExerciseDTO;
 
 @ContextConfiguration
@@ -105,7 +105,7 @@ public class CaseEndpointIT {
     String caseID = caseNotification.getCaseId();
     CaseEventCreationRequestDTO caseEventCreationRequestDTO =
         new CaseEventCreationRequestDTO(
-            "TestEvent", CategoryName.ACTION_CREATED, "SYSTEM", "SOCIALNOT", metadata);
+            "TestEvent", CategoryDTO.CategoryName.ACTION_CREATED, "SYSTEM", "SOCIALNOT", metadata);
 
     // When
     HttpResponse<CreatedCaseEventDTO> createdCaseResponse =
@@ -155,7 +155,7 @@ public class CaseEndpointIT {
     CaseEventCreationRequestDTO caseEventCreationRequestDTO =
         new CaseEventCreationRequestDTO(
             "TestEvent",
-            CategoryName.COLLECTION_INSTRUMENT_DOWNLOADED,
+            CategoryDTO.CategoryName.COLLECTION_INSTRUMENT_DOWNLOADED,
             "SYSTEM",
             "DUMMY",
             metadata);
@@ -195,7 +195,11 @@ public class CaseEndpointIT {
     String caseID = caseNotification.getCaseId();
     CaseEventCreationRequestDTO caseEventCreationRequestDTO =
         new CaseEventCreationRequestDTO(
-            "TestEvent", CategoryName.COLLECTION_INSTRUMENT_ERROR, "SYSTEM", "DUMMY", metadata);
+            "TestEvent",
+            CategoryDTO.CategoryName.COLLECTION_INSTRUMENT_ERROR,
+            "SYSTEM",
+            "DUMMY",
+            metadata);
 
     // When
     HttpResponse<CreatedCaseEventDTO> createdCaseResponse =
@@ -232,7 +236,11 @@ public class CaseEndpointIT {
     String caseID = caseNotification.getCaseId();
     CaseEventCreationRequestDTO caseEventCreationRequestDTO =
         new CaseEventCreationRequestDTO(
-            "TestEvent", CategoryName.SUCCESSFUL_RESPONSE_UPLOAD, "SYSTEM", "DUMMY", metadata);
+            "TestEvent",
+            CategoryDTO.CategoryName.SUCCESSFUL_RESPONSE_UPLOAD,
+            "SYSTEM",
+            "DUMMY",
+            metadata);
 
     // When
     HttpResponse<CreatedCaseEventDTO> createdCaseResponse =
@@ -269,7 +277,11 @@ public class CaseEndpointIT {
     String caseID = caseNotification.getCaseId();
     CaseEventCreationRequestDTO caseEventCreationRequestDTO =
         new CaseEventCreationRequestDTO(
-            "TestEvent", CategoryName.UNSUCCESSFUL_RESPONSE_UPLOAD, "SYSTEM", "DUMMY", metadata);
+            "TestEvent",
+            CategoryDTO.CategoryName.UNSUCCESSFUL_RESPONSE_UPLOAD,
+            "SYSTEM",
+            "DUMMY",
+            metadata);
 
     // When
     HttpResponse<CreatedCaseEventDTO> createdCaseResponse =
@@ -302,7 +314,11 @@ public class CaseEndpointIT {
     String caseID = caseNotification.getCaseId();
     CaseEventCreationRequestDTO caseEventCreationRequestDTO =
         new CaseEventCreationRequestDTO(
-            "TestEvent", CategoryName.SUCCESSFUL_RESPONSE_UPLOAD, "SYSTEM", "DUMMY", metadata);
+            "TestEvent",
+            CategoryDTO.CategoryName.SUCCESSFUL_RESPONSE_UPLOAD,
+            "SYSTEM",
+            "DUMMY",
+            metadata);
 
     HttpResponse<CreatedCaseEventDTO> createdCaseResponse =
         Unirest.post("http://localhost:" + port + "/cases/" + caseID + "/events")
@@ -329,7 +345,7 @@ public class CaseEndpointIT {
     assertThat(returnedCaseEventsResponse.getStatus()).isEqualTo(200);
     assertThat(returnedCaseEvents.length).isEqualTo(1);
     assertThat(returnedCaseEvents[0].getCategory())
-        .isEqualTo(CategoryName.SUCCESSFUL_RESPONSE_UPLOAD);
+        .isEqualTo(CategoryDTO.CategoryName.SUCCESSFUL_RESPONSE_UPLOAD);
     assertThat(returnedCaseEvents[0].getCreatedDateTime()).isNotNull();
   }
 
@@ -364,7 +380,11 @@ public class CaseEndpointIT {
     String caseID = caseNotification.getCaseId();
     CaseEventCreationRequestDTO caseEventCreationRequestDTO =
         new CaseEventCreationRequestDTO(
-            "TestEvent", CategoryName.SUCCESSFUL_RESPONSE_UPLOAD, "SYSTEM", "DUMMY", metadata);
+            "TestEvent",
+            CategoryDTO.CategoryName.SUCCESSFUL_RESPONSE_UPLOAD,
+            "SYSTEM",
+            "DUMMY",
+            metadata);
 
     HttpResponse<CreatedCaseEventDTO> createdCaseResponse =
         Unirest.post("http://localhost:" + port + "/cases/" + caseID + "/events")
@@ -399,7 +419,11 @@ public class CaseEndpointIT {
     String caseID = caseNotification.getCaseId();
     CaseEventCreationRequestDTO caseEventCreationRequestDTO =
         new CaseEventCreationRequestDTO(
-            "TestEvent", CategoryName.SUCCESSFUL_RESPONSE_UPLOAD, "SYSTEM", "DUMMY", metadata);
+            "TestEvent",
+            CategoryDTO.CategoryName.SUCCESSFUL_RESPONSE_UPLOAD,
+            "SYSTEM",
+            "DUMMY",
+            metadata);
 
     HttpResponse<CreatedCaseEventDTO> createdCaseResponse =
         Unirest.post("http://localhost:" + port + "/cases/" + caseID + "/events")

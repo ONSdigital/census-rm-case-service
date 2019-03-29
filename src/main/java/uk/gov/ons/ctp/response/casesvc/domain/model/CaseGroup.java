@@ -16,7 +16,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
-import uk.gov.ons.ctp.response.casesvc.representation.CaseGroupStatus;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CaseGroupStatus;
 
 /** Domain model object. */
 @Entity

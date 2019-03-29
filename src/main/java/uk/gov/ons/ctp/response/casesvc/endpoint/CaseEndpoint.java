@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.http.ResponseEntity;
@@ -28,17 +27,17 @@ import uk.gov.ons.ctp.common.endpoint.CTPEndpoint;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.InvalidRequestException;
 import uk.gov.ons.ctp.common.time.DateTimeUtil;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CaseDetailsDTO;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CaseEventCreationRequestDTO;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CaseEventDTO;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CaseGroupDTO;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CategoryDTO;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CreatedCaseEventDTO;
 import uk.gov.ons.ctp.response.casesvc.domain.model.Case;
 import uk.gov.ons.ctp.response.casesvc.domain.model.CaseEvent;
 import uk.gov.ons.ctp.response.casesvc.domain.model.CaseGroup;
 import uk.gov.ons.ctp.response.casesvc.domain.model.Category;
 import uk.gov.ons.ctp.response.casesvc.domain.repository.CaseRepository;
-import uk.gov.ons.ctp.response.casesvc.representation.CaseDetailsDTO;
-import uk.gov.ons.ctp.response.casesvc.representation.CaseEventCreationRequestDTO;
-import uk.gov.ons.ctp.response.casesvc.representation.CaseEventDTO;
-import uk.gov.ons.ctp.response.casesvc.representation.CaseGroupDTO;
-import uk.gov.ons.ctp.response.casesvc.representation.CategoryDTO;
-import uk.gov.ons.ctp.response.casesvc.representation.CreatedCaseEventDTO;
 import uk.gov.ons.ctp.response.casesvc.service.CaseGroupService;
 import uk.gov.ons.ctp.response.casesvc.service.CaseService;
 import uk.gov.ons.ctp.response.casesvc.service.CategoryService;
@@ -70,13 +69,12 @@ public final class CaseEndpoint implements CTPEndpoint {
       final CaseService caseService,
       final CaseGroupService caseGroupService,
       final CategoryService categoryService,
-      final CaseRepository caseRepository,
-      final @Qualifier("caseSvcBeanMapper") MapperFacade mapperFacade) {
+      final CaseRepository caseRepository) {
     this.caseService = caseService;
     this.caseGroupService = caseGroupService;
     this.categoryService = categoryService;
     this.caseRepository = caseRepository;
-    this.mapperFacade = mapperFacade;
+    this.mapperFacade = null;
   }
 
   /**
@@ -312,7 +310,6 @@ public final class CaseEndpoint implements CTPEndpoint {
    * the GET endpoint to find case events, with optional timestamps by case id
    *
    * @param caseId to find by
-   * @param category type to collect case event timestamp
    * @return the case events found, with optional timestamps (category required for this)
    * @throws CTPException something went wrong
    */

@@ -12,8 +12,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.sourceforge.cobertura.CoverageIgnore;
-import uk.gov.ons.ctp.response.casesvc.representation.CaseDTO;
-import uk.gov.ons.ctp.response.casesvc.representation.CategoryDTO;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CaseDTO;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CategoryDTO;
 
 /** Domain model object. */
 @CoverageIgnore

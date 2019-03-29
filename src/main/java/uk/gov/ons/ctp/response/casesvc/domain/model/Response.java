@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 import net.sourceforge.cobertura.CoverageIgnore;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
-import uk.gov.ons.ctp.response.casesvc.representation.InboundChannel;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.InboundChannel;
 
 /** Domain model object. */
 @CoverageIgnore

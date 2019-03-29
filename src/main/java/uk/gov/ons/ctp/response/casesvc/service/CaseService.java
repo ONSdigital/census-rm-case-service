@@ -19,6 +19,15 @@ import uk.gov.ons.ctp.response.action.representation.ActionPlanDTO;
 import uk.gov.ons.ctp.response.casesvc.client.ActionSvcClient;
 import uk.gov.ons.ctp.response.casesvc.client.CollectionExerciseSvcClient;
 import uk.gov.ons.ctp.response.casesvc.client.InternetAccessCodeSvcClient;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CaseDTO;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CaseGroupStatus;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CaseNotification;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CaseState;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.CategoryDTO;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.InboundChannel;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.NotificationType;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.SampleUnit;
+import uk.gov.ons.ctp.response.casesvc.domain.dto.SampleUnitParent;
 import uk.gov.ons.ctp.response.casesvc.domain.model.Case;
 import uk.gov.ons.ctp.response.casesvc.domain.model.CaseEvent;
 import uk.gov.ons.ctp.response.casesvc.domain.model.CaseGroup;
@@ -32,16 +41,6 @@ import uk.gov.ons.ctp.response.casesvc.domain.repository.CaseRepository;
 import uk.gov.ons.ctp.response.casesvc.domain.repository.CategoryRepository;
 import uk.gov.ons.ctp.response.casesvc.message.CaseNotificationPublisher;
 import uk.gov.ons.ctp.response.casesvc.message.EventPublisher;
-import uk.gov.ons.ctp.response.casesvc.message.notification.CaseNotification;
-import uk.gov.ons.ctp.response.casesvc.message.notification.NotificationType;
-import uk.gov.ons.ctp.response.casesvc.message.sampleunitnotification.SampleUnit;
-import uk.gov.ons.ctp.response.casesvc.message.sampleunitnotification.SampleUnitParent;
-import uk.gov.ons.ctp.response.casesvc.representation.CaseDTO;
-import uk.gov.ons.ctp.response.casesvc.representation.CaseGroupStatus;
-import uk.gov.ons.ctp.response.casesvc.representation.CaseState;
-import uk.gov.ons.ctp.response.casesvc.representation.CategoryDTO;
-import uk.gov.ons.ctp.response.casesvc.representation.CategoryDTO.CategoryName;
-import uk.gov.ons.ctp.response.casesvc.representation.InboundChannel;
 import uk.gov.ons.ctp.response.casesvc.utility.Constants;
 import uk.gov.ons.ctp.response.casesvc.utility.IacDispenser;
 import uk.gov.ons.ctp.response.collection.exercise.representation.CollectionExerciseDTO;
@@ -501,11 +500,13 @@ public class CaseService {
    */
   private void recordCaseResponse(Category category, Case targetCase, Timestamp timestamp) {
     InboundChannel channel = null;
-    if (category.getCategoryName() == CategoryName.OFFLINE_RESPONSE_PROCESSED) {
+    if (category.getCategoryName() == CategoryDTO.CategoryName.OFFLINE_RESPONSE_PROCESSED) {
       channel = InboundChannel.OFFLINE;
-    } else if (category.getCategoryName() == CategoryName.ONLINE_QUESTIONNAIRE_RESPONSE) {
+    } else if (category.getCategoryName()
+        == CategoryDTO.CategoryName.ONLINE_QUESTIONNAIRE_RESPONSE) {
       channel = InboundChannel.ONLINE;
-    } else if (category.getCategoryName() == CategoryName.PAPER_QUESTIONNAIRE_RESPONSE) {
+    } else if (category.getCategoryName()
+        == CategoryDTO.CategoryName.PAPER_QUESTIONNAIRE_RESPONSE) {
       channel = InboundChannel.PAPER;
     }
 
@@ -614,7 +615,7 @@ public class CaseService {
   public List<CaseEvent> findCaseEventsByCaseFKAndCategory(Integer casePK, List<String> categories)
       throws CTPException {
     try {
-      Set<CategoryName> categoryNames =
+      Set<CategoryDTO.CategoryName> categoryNames =
           categories.stream().map(CategoryDTO.CategoryName::fromValue).collect(Collectors.toSet());
       return caseEventRepo.findByCaseFKAndCategoryInOrderByCreatedDateTimeDesc(
           casePK, categoryNames);
