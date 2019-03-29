@@ -21,8 +21,8 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.casesvc.domain.model.Case;
 import uk.gov.ons.ctp.response.casesvc.domain.model.CaseEvent;
 import uk.gov.ons.ctp.response.casesvc.message.feedback.CaseReceipt;
-import uk.gov.ons.ctp.response.casesvc.message.feedback.InboundChannel;
 import uk.gov.ons.ctp.response.casesvc.representation.CategoryDTO;
+import uk.gov.ons.ctp.response.casesvc.representation.InboundChannel;
 import uk.gov.ons.ctp.response.casesvc.service.CaseService;
 
 /** The reader of CaseReceipts from queue */

@@ -27,8 +27,8 @@ import uk.gov.ons.ctp.common.time.DateTimeUtil;
 import uk.gov.ons.ctp.response.casesvc.domain.model.Case;
 import uk.gov.ons.ctp.response.casesvc.domain.model.CaseEvent;
 import uk.gov.ons.ctp.response.casesvc.message.feedback.CaseReceipt;
-import uk.gov.ons.ctp.response.casesvc.message.feedback.InboundChannel;
 import uk.gov.ons.ctp.response.casesvc.representation.CategoryDTO;
+import uk.gov.ons.ctp.response.casesvc.representation.InboundChannel;
 import uk.gov.ons.ctp.response.casesvc.service.CaseService;
 
 /** To unit test CaseReceiptReceiver */

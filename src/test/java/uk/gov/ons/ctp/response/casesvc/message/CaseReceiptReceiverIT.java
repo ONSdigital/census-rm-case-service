@@ -29,13 +29,13 @@ import uk.gov.ons.ctp.response.casesvc.CaseCreator;
 import uk.gov.ons.ctp.response.casesvc.IACServiceStub;
 import uk.gov.ons.ctp.response.casesvc.client.CollectionExerciseSvcClient;
 import uk.gov.ons.ctp.response.casesvc.message.feedback.CaseReceipt;
-import uk.gov.ons.ctp.response.casesvc.message.feedback.InboundChannel;
 import uk.gov.ons.ctp.response.casesvc.message.notification.CaseNotification;
 import uk.gov.ons.ctp.response.casesvc.representation.CaseDetailsDTO;
 import uk.gov.ons.ctp.response.casesvc.representation.CaseEventCreationRequestDTO;
 import uk.gov.ons.ctp.response.casesvc.representation.CaseGroupStatus;
 import uk.gov.ons.ctp.response.casesvc.representation.CategoryDTO;
 import uk.gov.ons.ctp.response.casesvc.representation.CreatedCaseEventDTO;
+import uk.gov.ons.ctp.response.casesvc.representation.InboundChannel;
 import uk.gov.ons.ctp.response.collection.exercise.representation.CollectionExerciseDTO;
 
 @ContextConfiguration
