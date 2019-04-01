@@ -2,6 +2,7 @@ package uk.gov.ons.ctp.response.casesvc;
 
 import static org.junit.Assert.assertNotNull;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.godaddy.logging.Logger;
 import com.godaddy.logging.LoggerFactory;
 import java.io.ByteArrayInputStream;
@@ -13,6 +14,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 import uk.gov.ons.ctp.common.utility.Mapzer;
 import uk.gov.ons.ctp.response.casesvc.config.AppConfig;
+import uk.gov.ons.ctp.response.casesvc.domain.model.Case;
 import uk.gov.ons.ctp.response.casesvc.message.notification.CaseNotification;
 import uk.gov.ons.ctp.response.casesvc.message.sampleunitnotification.SampleUnitParent;
 import uk.gov.ons.tools.rabbit.Rabbitmq;
@@ -28,6 +30,7 @@ public class CaseCreator {
   @Autowired private AppConfig appConfig;
   @Autowired private ResourceLoader resourceLoader;
   @Autowired private IACServiceStub iacServiceStub;
+  @Autowired private ObjectMapper objectMapper;
 
   /**
    * Sends a sample unit in a message so that casesvc creates a case, then waits for a message on
@@ -41,20 +44,24 @@ public class CaseCreator {
 
     iacServiceStub.createIACStub();
 
-    SampleUnitParent sampleUnit = new SampleUnitParent();
-    sampleUnit.setCollectionExerciseId(collectionExerciseId.toString());
-    sampleUnit.setId(sampleUnitId.toString());
-    sampleUnit.setActionPlanId(UUID.randomUUID().toString());
-    sampleUnit.setSampleUnitRef(sampleUnitRef);
-    sampleUnit.setCollectionInstrumentId(UUID.randomUUID().toString());
-    sampleUnit.setPartyId(UUID.randomUUID().toString());
-    sampleUnit.setSampleUnitType(sampleUnitType);
+    SampleUnitParent sampleUnitParent = new SampleUnitParent();
+    sampleUnitParent.setCollectionExerciseId(collectionExerciseId.toString());
+    sampleUnitParent.setId(sampleUnitId.toString());
+    sampleUnitParent.setActionPlanId(UUID.randomUUID().toString());
+    sampleUnitParent.setSampleUnitRef(sampleUnitRef);
+    sampleUnitParent.setCollectionInstrumentId(UUID.randomUUID().toString());
+    sampleUnitParent.setPartyId(UUID.randomUUID().toString());
+    sampleUnitParent.setSampleUnitType(sampleUnitType);
 
     JAXBContext jaxbContext = JAXBContext.newInstance(SampleUnitParent.class);
-    String xml =
-        new Mapzer(resourceLoader)
-            .convertObjectToXml(
-                jaxbContext, sampleUnit, "casesvc/xsd/inbound/SampleUnitNotification.xsd");
+
+    String json = objectMapper.writeValueAsString(sampleUnitParent);
+
+//    String xml =
+//            new Mapzer(resourceLoader)
+//                .convertObjectToXml(
+//                    jaxbContext, sampleUnit, "casesvc/xsd/inbound/SampleUnitNotification.xsd");
+//
 
     BlockingQueue<String> queue =
         getMessageListener()
@@ -62,13 +69,21 @@ public class CaseCreator {
                 SimpleMessageBase.ExchangeType.Direct,
                 "case-outbound-exchange",
                 "Case.LifecycleEvents.binding");
-    getMessageSender().sendMessage("collection-inbound-exchange", "Case.CaseDelivery.binding", xml);
+    getMessageSender().sendMessage("collection-inbound-exchange", "Case.CaseDelivery.binding", json);
 
     String message = waitForNotification(queue);
 
-    jaxbContext = JAXBContext.newInstance(CaseNotification.class);
-    return (CaseNotification)
-        jaxbContext.createUnmarshaller().unmarshal(new ByteArrayInputStream(message.getBytes()));
+    CaseNotification caseNotification = objectMapper.readValue(message, CaseNotification.class);
+
+    return caseNotification;
+
+//    jaxbContext = JAXBContext.newInstance(CaseNotification.class);
+//
+//
+//
+//
+//    return (CaseNotification)
+//        jaxbContext.createUnmarshaller().unmarshal(new ByteArrayInputStream(message.getBytes()));
   }
 
   private String waitForNotification(BlockingQueue<String> queue) throws Exception {
