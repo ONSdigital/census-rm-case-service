@@ -47,7 +47,7 @@
     input-channel="caseCreationValid" output-channel="caseTransformed"
     unmarshaller="caseCreationMarshaller"/>
 
-  <bean class="org.springframework.oxm.jaxb.Jaxb2Marshaller" id="caseCreationMarshaller">
+  <bean class="org.springframework.integration.json.ObjectToJsonTransformer" id="caseCreationMarshaller">
     <property name="contextPath"
       value="uk.gov.ons.ctp.response.casesvc.message.sampleunitnotification"/>
   </bean>
@@ -95,9 +95,10 @@
     input-channel="caseDlqChannel" output-channel="caseDlqInterimChannel"/>
 
   <int:channel id="caseDlqChannelXml"/>
-  <int-xml:marshalling-transformer
+  <int:json-to-object-transformer
     input-channel="caseDlqInterimChannel" marshaller="caseCreationMarshaller"
     output-channel="caseDlqChannelXml" result-transformer="caseOutboundTransformer"/>
+
   <bean class="org.springframework.integration.xml.transformer.ResultToStringTransformer"
     id="caseOutboundTransformer"/>
 

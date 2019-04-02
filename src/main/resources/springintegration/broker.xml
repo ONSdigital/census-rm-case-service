@@ -62,7 +62,6 @@
     </rabbit:bindings>
   </rabbit:direct-exchange>
 
-
   <rabbit:direct-exchange name="collection-inbound-exchange">
     <rabbit:bindings>
       <rabbit:binding key="Case.CaseDelivery.binding" queue="Case.CaseDelivery"/>

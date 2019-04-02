@@ -69,6 +69,10 @@ public class CaseCreator {
                 SimpleMessageBase.ExchangeType.Direct,
                 "case-outbound-exchange",
                 "Case.LifecycleEvents.binding");
+
+    //Temp, to see if this is the issue
+//    String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><ns2:sampleUnitParent xmlns:ns2=\"http://ons.gov.uk/ctp/response/casesvc/message/sampleunitnotification\"><id>db0467b5-2f4b-4093-9a6b-0dc494b4306a</id><sampleUnitRef>LMS0003</sampleUnitRef><sampleUnitType>H</sampleUnitType><partyId>ea684244-1401-4ad0-a46d-96bcbaba1693</partyId><collectionInstrumentId>d48b7219-70bc-4090-9a14-df20b729aad5</collectionInstrumentId><actionPlanId>33978fd1-7c32-471d-9cc9-f6340cfcb13d</actionPlanId><collectionExerciseId>90f43060-1a8c-4869-b001-0b00ced09fe2</collectionExerciseId></ns2:sampleUnitParent>";
+
     getMessageSender().sendMessage("collection-inbound-exchange", "Case.CaseDelivery.binding", json);
 
     String message = waitForNotification(queue);
@@ -78,10 +82,6 @@ public class CaseCreator {
     return caseNotification;
 
 //    jaxbContext = JAXBContext.newInstance(CaseNotification.class);
-//
-//
-//
-//
 //    return (CaseNotification)
 //        jaxbContext.createUnmarshaller().unmarshal(new ByteArrayInputStream(message.getBytes()));
   }

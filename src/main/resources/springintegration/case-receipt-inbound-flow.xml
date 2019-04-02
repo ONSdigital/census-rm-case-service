@@ -21,13 +21,13 @@
     <property name="channelTransacted" value="true"/>
   </bean>
 
-  <!-- Xml msg is taken off the queue Case.Responses and put on the channel caseReceiptXml -->
-  <int:channel id="caseReceiptXml"/>
-  <bean class="org.springframework.amqp.support.converter.SimpleMessageConverter"
-    id="simpleMessageConverter"/>
-  <int-amqp:inbound-channel-adapter channel="caseReceiptXml"
-    id="caseReceiptInboundAmqp"
-    listener-container="caseReceiptMessageListenerContainer" message-converter="simpleMessageConverter"/>
+  <!--&lt;!&ndash; Xml msg is taken off the queue Case.Responses and put on the channel caseReceiptXml &ndash;&gt;-->
+  <!--<int:channel id="caseReceiptXml"/>-->
+  <!--<bean class="org.springframework.amqp.support.converter.SimpleMessageConverter"-->
+    <!--id="simpleMessageConverter"/>-->
+  <!--<int-amqp:inbound-channel-adapter channel="caseReceiptXml"-->
+    <!--id="caseReceiptInboundAmqp"-->
+    <!--listener-container="caseReceiptMessageListenerContainer" message-converter="simpleMessageConverter"/>-->
 
   <!-- Xml validated against the inbound schema -->
   <int:channel id="caseReceiptInvalidXml"/>

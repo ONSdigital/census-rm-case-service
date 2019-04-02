@@ -7,6 +7,9 @@ import net.sourceforge.cobertura.CoverageIgnore;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
@@ -20,7 +23,10 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.integration.amqp.inbound.AmqpInboundChannelAdapter;
 import org.springframework.integration.annotation.IntegrationComponentScan;
+import org.springframework.integration.channel.DirectChannel;
+import org.springframework.messaging.MessageChannel;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -81,6 +87,46 @@ public class CaseSvcApplication {
   public static void main(final String[] args) {
 
     SpringApplication.run(CaseSvcApplication.class, args);
+  }
+
+  @Bean
+  public MessageChannel amqpInputChannel() {
+    return new DirectChannel();
+  }
+
+  @Bean
+  public AmqpInboundChannelAdapter inbound( @Qualifier("container")SimpleMessageListenerContainer listenerContainer,
+                                           @Qualifier("amqpInputChannel") MessageChannel channel) {
+    AmqpInboundChannelAdapter adapter = new AmqpInboundChannelAdapter(listenerContainer);
+    adapter.setOutputChannel(channel);
+    return adapter;
+  }
+
+  @Bean
+  public SimpleMessageListenerContainer container(ConnectionFactory connectionFactory) {
+    SimpleMessageListenerContainer container =
+            new SimpleMessageListenerContainer(connectionFactory);
+    container.setQueueNames("Case.CaseDelivery");
+    container.setConcurrentConsumers(1);
+
+    return container;
+  }
+
+  @Bean
+  public RabbitTemplate caseNotificationRabbitTemplate(ConnectionFactory connectionFactory) {
+    RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+    rabbitTemplate.setExchange("case-outbound-exchange");
+    rabbitTemplate.setRoutingKey("Case.LifecycleEvents.binding");
+
+    return rabbitTemplate;
+  }
+
+  @Bean
+  public RabbitTemplate amqpTemplate(ConnectionFactory connectionFactory) {
+    RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+    rabbitTemplate.setExchange("event-message-outbound-exchange");
+
+    return rabbitTemplate;
   }
 
   @PostConstruct

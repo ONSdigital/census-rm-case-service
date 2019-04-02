@@ -85,6 +85,9 @@ public class CaseReceiptReceiverIT {
 
   @Test
   public void socialCaseShouldReceipt() throws Exception {
+    //TODO, make this work, currently hangs on getting the msg?
+
+
     // Given
     UUID sampleUnitId = UUID.randomUUID();
     CaseNotification caseNotif =
