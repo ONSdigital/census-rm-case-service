@@ -32,7 +32,6 @@ import uk.gov.ons.ctp.response.casesvc.representation.CaseState;
 import uk.gov.ons.ctp.response.casesvc.utility.IacDispenser;
 import uk.gov.ons.ctp.response.collection.exercise.representation.CollectionExerciseDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
-import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitType;
 
 /** Test Case created by Sample */
 @RunWith(MockitoJUnitRunner.class)
@@ -73,12 +72,15 @@ public class CaseCreationServiceTest {
     when(collectionExerciseSvcClient.getCollectionExercise(any()))
         .thenReturn(collectionExercises.get(0));
 
-    Case updatedCase = new Case();
-    updatedCase.setCasePK(999);
-    updatedCase.setId(UUID.randomUUID());
-    updatedCase.setActionPlanId(UUID.randomUUID());
-    updatedCase.setSampleUnitType(SampleUnitType.H);
-    when(caseRepo.save(any(Case.class))).thenReturn(updatedCase);
+    when(caseRepo.saveAndFlush(any(Case.class)))
+        .thenAnswer(
+            invocation -> {
+              Case caze = invocation.getArgumentAt(0, Case.class);
+              caze.setCasePK(666);
+              return caze;
+            });
+    when(caseRepo.save(any(Case.class)))
+        .thenAnswer(invocation -> invocation.getArgumentAt(0, Case.class));
 
     CaseGroup imaginaryCaseGroup = new CaseGroup();
     imaginaryCaseGroup.setCollectionExerciseId(UUID.randomUUID());
@@ -103,7 +105,8 @@ public class CaseCreationServiceTest {
     assertEquals(CaseGroupStatus.NOTSTARTED, capturedCaseGroup.getStatus());
 
     ArgumentCaptor<Case> caze = ArgumentCaptor.forClass(Case.class);
-    verify(caseRepo, times(2)).save(caze.capture());
+    verify(caseRepo, times(1)).saveAndFlush(any());
+    verify(caseRepo, times(1)).save(caze.capture());
     Case capturedCase = caze.getAllValues().get(0);
 
     assertEquals(UUID.class, capturedCase.getId().getClass());

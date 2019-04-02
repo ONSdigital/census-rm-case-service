@@ -404,15 +404,16 @@ public class CaseService {
     Category category = new Category();
     category.setShortDescription("Initial creation of case");
 
-    Case parentCase = createNewCase(sampleUnitParent, newCaseGroup);
-    caseRepo.save(parentCase);
+    Case caze = createNewCase(sampleUnitParent, newCaseGroup);
+    // It seems like we have to flush here or else the caseref doesn't get generated
+    caze = caseRepo.saveAndFlush(caze);
 
-    createCaseCreatedEvent(parentCase, category);
-    log.with("case_id", parentCase.getId().toString())
-        .with("sample_unit_type", parentCase.getSampleUnitType().toString())
+    createCaseCreatedEvent(caze, category);
+    log.with("case_id", caze.getId().toString())
+        .with("sample_unit_type", caze.getSampleUnitType().toString())
         .debug("New Case created");
 
-    distributeCase(parentCase, iacDispenser.getIacCode());
+    distributeCase(caze, iacDispenser.getIacCode());
   }
 
   /**
