@@ -26,7 +26,7 @@ services:
     - postgres-case-it
     - redis-case-it
     - rabbitmq-case-it
-    image: sdcplatform/collectionexercisesvc
+    image: eu.gcr.io/census-rm-ci/rm/census-rm-collectionexercisesvc
     environment:
     - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-case-it:5432/postgres?sslmode=disable
     - SPRING_DATASOURCE_USERNAME=postgres
@@ -52,7 +52,7 @@ services:
 
   survey:
     container_name: survey-case-it
-    image: sdcplatform/surveysvc
+    image: eu.gcr.io/census-rm-ci/rm/census-rm-surveysvc
     external_links:
     - postgres-case-it
     environment:
@@ -65,7 +65,7 @@ services:
 
   action:
     container_name: action-case-it
-    image: sdcplatform/actionsvc
+    image: eu.gcr.io/census-rm-ci/rm/census-rm-actionsvc
     external_links:
     - postgres-case-it
     - rabbitmq-case-it
