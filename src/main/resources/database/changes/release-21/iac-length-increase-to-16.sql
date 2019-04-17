@@ -1,0 +1,1 @@
+ALTER TABLE casesvc.caseiacaudit ALTER COLUMN iac TYPE varchar(16);
